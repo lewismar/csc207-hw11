@@ -5,9 +5,22 @@ import java.util.LinkedList;
 
 public class JSONObject {
 
+    /**
+     * Field
+     */
+
     LinkedList<JSONMember> members = new LinkedList<JSONMember>();
+    
+    /*
+     * Global Variable
+     */
     int i = 0; // global variable to traverse the string
 
+    
+    /*
+     * Constructor
+     */
+    
     public JSONObject(String str) throws Exception {
 
 	String key = "";
@@ -34,7 +47,16 @@ public class JSONObject {
     } // JSONObject(String str)
     
     
-    
+    /*
+     * Helper Methods
+     */
+      
+    /**
+     * Parse the value of a pair
+     * 
+     * @pre i is pointing at the value after ':'
+     */
+     
     private Object parseValue(String str) throws Exception {
 	// Cases for value:
 
@@ -143,6 +165,11 @@ public class JSONObject {
 	return value;
     }
     
+    /**
+     * @pre i is at the position of a quotation mark.
+     * @return tmp, the string that is inbetween the quote that i is on and the
+     *     occurence of '\"'
+     */
     private String onString(String str) {
 	// String to return
 	String tmp = "";
