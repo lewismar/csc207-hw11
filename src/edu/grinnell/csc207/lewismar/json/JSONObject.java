@@ -137,7 +137,7 @@ public class JSONObject {
 		// move past open brace or comma
 		vals.add(parseValue(str));
 	    } // while
-	      // move past end brace;
+	    // move past end brace;
 	    i++;
 	    value = vals;
 	} // else if
@@ -206,5 +206,4 @@ public class JSONObject {
 	} // while
 	return str.substring(initial, i + 1);
     } // inBrace(String)
-
-}
+} // class JSONObject
