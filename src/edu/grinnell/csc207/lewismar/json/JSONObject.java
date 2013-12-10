@@ -1,49 +1,148 @@
 package edu.grinnell.csc207.lewismar.json;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 public class JSONObject {
 
-    String key;
-    Object value;
-    static int i = 0; // global variable to traverse the string
+    LinkedList<JSONMember> members = new LinkedList<JSONMember>();
+    int i = 0; // global variable to traverse the string
 
     public JSONObject(String str) throws Exception {
 
-	// Find the key
-	i = 1; // to traverse str, start at 1 because 0 is a quote
-	while (str.charAt(i) != '"' && str.charAt(i-1) != '\\') {
-	    key += str.charAt(i);
+	String key = "";
+	Object value;
+	
+	
+	while (str.charAt(i) != '}') {
+	    
+	    // Find the key
+	    // move past the first brace or comma
 	    i++;
+	    key = onString(str);
+	    
+	    // we're at a colon
+	    if (str.charAt(++i) != ':') {
+		throw new Exception("invalid input");
+	    } // if
+	    
+	    // Cases for value:
+	    value = parseValue(str);
+	    
+	    members.add(new JSONMember(key, value));
 	} // while
-	  // were at a colon
-	while (str.charAt(i) == ' ') {
-	    i++;
-	} // while
-	  
+    } // JSONObject(String str)
+    
+    
+    
+    private Object parseValue(String str) throws Exception {
 	// Cases for value:
-	  // We have a string
-	if (str.charAt(i) == '\"') {
-	    this.value = onString(str);
+
+	Object value;
+
+	// We have a string
+	if (str.charAt(++i) == '\"') {
+	    value = onString(str);
+	    // move past end quote
+	    i++;
 	}
+
 	// We have digits
 	else if (Character.isDigit(str.charAt(i))) {
 	    String toValue = "";
-	    while (i < str.length()) {
-		toValue += str.charAt(i);
+	    String exp = "";
+	    boolean exponent = false;
+	    boolean isTenPower = false;
+	    while (str.charAt(i) != ',' && str.charAt(i) != '}') {
+		if (str.charAt(i) == 'e') {
+		    exponent = true;
+		    // move past a positive sign after an e
+		    if (str.charAt(i + 1) == '+') {
+			i++;
+		    } // if
+		} else if (str.charAt(i) == 'E') {
+		    exponent = true;
+		    isTenPower = true;
+		    // move past a positive sign after an E
+		    if (str.charAt(i + 1) == '+') {
+			i++;
+		    } // if
+		} else if (exponent) {
+		    exp += str.charAt(i);
+		} else {
+		    toValue += str.charAt(i);
+		} // else
+
 		i++;
-	    } // while
-	    this.value = new Double(toValue);
-	}
+	    } // while (not comma)
+
+	    if (exponent) {
+		if (isTenPower) {
+		    value = new Double(toValue)
+			    * Math.pow(10, (new Integer(exp)));
+		} // if (isTenPower)
+		else {
+		    value = Math.pow(new Double(toValue), new Integer(exp));
+		} // else
+	    } else {
+		value = new Double(toValue);
+	    } // else
+	} // else if (digit)
+
 	// We have another object
-	else if (str.charAt(i) == '{')
+	else if (str.charAt(i) == '{') {
 	    value = new JSONObject(inBrace(str));
+	    // move past the end brace of the object
+	    i++;
+	} // else if
+
 	// we have an array
-	
+	else if (str.charAt(i) == '[') {
+	    ArrayList<Object> vals = new ArrayList<Object>();
+
+	    // if it is an empty array move past the value and return the empty
+	    // array
+	    if (str.charAt(i + 1) == ']') {
+		i += 2;
+		return vals;
+	    } // if
+
+	    // populate the list from the values in the array
+	    while (str.charAt(i) != ']') {
+		// move past open brace or comma
+		vals.add(parseValue(str));
+	    } // while
+	      // move past end brace;
+	    i++;
+	    value = vals;
+	} // else if
+
+	else if (str.charAt(i) == 't') {
+	    value = true;
+	    // advance past the true
+	    i += 4;
+	} // else if
+
+	else if (str.charAt(i) == 'f') {
+	    value = false;
+	    // advance past the false
+	    i += 5;
+	} // else if
+
+	else if (str.charAt(i) == 'n') {
+	    value = null;
+	    // advance past the null
+	    i += 4;
+	} // else if
+
 	// otherwise fail
 	else {
 	    throw new Exception("invalid input");
-	}
+	} // else
 
+	return value;
     }
+    
     private String onString(String str) {
 	// String to return
 	String tmp = "";
@@ -55,14 +154,14 @@ public class JSONObject {
 	    i++;
 	}
 	return tmp;
-
-    }
+    } // onString(String str)
+    
     /**
      * takes a string that begins with { and returns the substring between that
      * brace and its counterpart
      */
-    private static String inBrace(String str) {
-	int initial = i + 1;
+    private String inBrace(String str) {
+	int initial = i;
 	int open = 1;
 	char c;
 	// currently at a brace
@@ -75,7 +174,7 @@ public class JSONObject {
 		open--;
 	    } // if/else if
 	} // while
-	return str.substring(initial, i - 1);
+	return str.substring(initial, i + 1);
     } // inBrace(String)
 
 }
