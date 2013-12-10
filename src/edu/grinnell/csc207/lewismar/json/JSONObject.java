@@ -9,6 +9,9 @@ public class JSONObject {
     int i = 0; // global variable to traverse the string
 
     public JSONObject(String str) throws Exception {
+	
+	str = str.replace(" ", "");
+	str = str.replace("\n", "");
 
 	String key = "";
 	Object value;
