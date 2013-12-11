@@ -3,24 +3,32 @@ package edu.grinnell.csc207.lewismar.json;
 import java.util.ArrayList;
 import java.util.LinkedList;
 
+/**
+ * Class that contains a linked list of a JSON Object's members
+ * @author Tiffany Nguyen
+ * @author Daniel Goldstein
+ * @author Mark Lewis
+ * @author Earnest Wheeler
+ *
+ */
 public class JSONObject {
 
     /**
-     * Field
+     * Linked list that contains the members of the JSON object
      */
-
     LinkedList<JSONMember> members = new LinkedList<JSONMember>();
     
-    /*
-     * Global Variable
+    /**
+     * Global Variable that keeps track of the character that the 
+     * constructor is currently at
      */
     int i = 0; // global variable to traverse the string
 
     
-    /*
-     * Constructor
-     */
-    
+    /**
+     * Constructor that takes a string in JSON formatting and puts
+     * the data into a linked list
+     */  
     public JSONObject(String str) throws Exception {
 
 	String key = "";
@@ -28,9 +36,8 @@ public class JSONObject {
 	
 	skipWhiteSpace(str);
 	
+	// add all of the members in the object to members
 	while (str.charAt(i) != '}') {
-	    
-	    
 	    
 	    // Find the key
 	    // move past the first brace or comma and whitespace
@@ -39,13 +46,11 @@ public class JSONObject {
 	    
 	    key = onString(str);
 	    
-	    // move past end quote
+	    // move past end quote and skip any whitespace
 	    i++;
-	    
-	    //skip any white space
 	    skipWhiteSpace(str);
 	    
-	    // we're at a colon
+	    // we should be at a colon
 	    if (str.charAt(i) != ':') {
 		throw new Exception("invalid input");
 	    } // if
@@ -57,12 +62,6 @@ public class JSONObject {
 	    // Cases for value:
 	    value = parseValue(str);
 	    
-	    /* move past comma and skip whitespace if not at end
-	    if (i < str.length() - 1) {
-		i++;
-		skipWhiteSpace(str);
-	    } // if
-	    */
 	    members.add(new JSONMember(key, value));
 	} // while
     } // JSONObject(String str)
@@ -73,22 +72,21 @@ public class JSONObject {
      */
       
     /**
-     * Parse the value of a pair
+     * Parse the value of a member
      * 
      * @pre i is pointing at the value after ':'
-     */
-     
+     */ 
     private Object parseValue(String str) throws Exception {
 	// Cases for value:
 
-	Object value;
+	Object value; // value to return
 
 	// We have a string
 	if (str.charAt(i) == '\"') {
 	    value = onString(str);
 	    // move past end quote
 	    i++;
-	}
+	} // if
 
 	// We have digits
 	else if (Character.isDigit(str.charAt(i))) {
@@ -152,13 +150,17 @@ public class JSONObject {
 
 	    // populate the list from the values in the array
 	    while (str.charAt(i) != ']') {
-		// move past open brace or comma
+		// move past open brace or comma and skip whitespace
 		i++;
 		skipWhiteSpace(str);
 		vals.add(parseValue(str));
+		//skip whitespace before next comma/bracket
+		skipWhiteSpace(str);
+		
 	    } // while
 	    // move past end brace;
 	    i++;
+	    skipWhiteSpace(str);
 	    value = vals;
 	} // else if
 
@@ -186,12 +188,12 @@ public class JSONObject {
 	} // else
 
 	return value;
-    }
+    } // parseValue(String)
     
     /**
      * @pre i is at the position of a quotation mark.
-     * @return tmp, the string that is inbetween the quote that i is on and the
-     *     occurence of '\"'
+     * @return tmp, the string that is in-between the quote that i is on and the
+     *     occurrence of '\"'
      */
     private String onString(String str) {
 	// String to return
@@ -202,13 +204,14 @@ public class JSONObject {
 	while (str.charAt(i) != '\"' && str.charAt(i - 1) != '\\') {
 	    tmp += str.charAt(i);
 	    i++;
-	}
+	} // while
 	return tmp;
     } // onString(String str)
     
     /**
-     * takes a string that begins with { and returns the substring between that
-     * brace and its counterpart
+     * @pre str.charAt(i) == '{'
+     * @return the substring that starts with the starting brace and ends with
+     *         its counterpart
      */
     private String inBrace(String str) {
 	int initial = i;
@@ -227,10 +230,14 @@ public class JSONObject {
 	return str.substring(initial, i + 1);
     } // inBrace(String)
     
+    /**
+     * private method to move past any white space characters starting at
+     * str.charAt(i) and ending when i is not pointing at a whitespace character
+     * or i > str.length()
+     */
     private void skipWhiteSpace(String str) {
 	while (i < str.length() && Character.isWhitespace(str.charAt(i))) {
 	        i++;
 	} // while
-	
-    }
+    } // skipWhiteSpace(String)
 } // class JSONObject

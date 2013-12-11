@@ -6,6 +6,15 @@ import java.util.ArrayList;
 
 import org.junit.Test;
 
+/**
+ * JUnit tests for the JSONObject constructor
+ * 
+ * @author Daniel Goldstein
+ * @author Earnest Wheeler
+ * @author Mark Lewis
+ * @author Tiffany Nguyen
+ *
+ */
 public class JSONObjectTest {
 
     @SuppressWarnings("unchecked")
@@ -34,14 +43,12 @@ public class JSONObjectTest {
 		((JSONObject) obj.members.get(1).value).members.get(2).value);
 
 	obj = new JSONObject(
-		"{\"Arrizle\":[5,1,2,9,3, 23,6,true,false,\"oreos\" ] }");
+		"{\"Arrizle\":[5,1,2,9,3, 23,6,true,false,\"oreos\"]}");
 	Object[] myArrayDotJPG = { 5.0, 1.0, 2.0, 9.0, 3.0, 23.0, 6.0, true,
 		false, "oreos" };
-	ArrayList<Object> objArr = (ArrayList<Object>) obj.members.get(0).value;
+	ArrayList<Object> myArrayListDotMPG = (ArrayList<Object>) obj.members.get(0).value;
 	for (int i = 0; i < 10; i++) {
-	    assertEquals("Array test " + i, myArrayDotJPG[i], objArr.get(i));
+	    assertEquals("Array test " + i, myArrayDotJPG[i], myArrayListDotMPG.get(i));
 	} // for
-
-    }
-
-}
+    } // test()
+} // JSONObjectTest
