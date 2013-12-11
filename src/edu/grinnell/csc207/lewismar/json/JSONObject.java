@@ -22,29 +22,47 @@ public class JSONObject {
      */
     
     public JSONObject(String str) throws Exception {
-	
-	str = str.replace(" ", "");
-	str = str.replace("\n", "");
 
 	String key = "";
 	Object value;
 	
+	skipWhiteSpace(str);
 	
 	while (str.charAt(i) != '}') {
 	    
+	    
+	    
 	    // Find the key
-	    // move past the first brace or comma
+	    // move past the first brace or comma and whitespace
 	    i++;
+	    skipWhiteSpace(str);
+	    
 	    key = onString(str);
 	    
+	    // move past end quote
+	    i++;
+	    
+	    //skip any white space
+	    skipWhiteSpace(str);
+	    
 	    // we're at a colon
-	    if (str.charAt(++i) != ':') {
+	    if (str.charAt(i) != ':') {
 		throw new Exception("invalid input");
 	    } // if
+	    
+	    // move past colon and skip white space
+	    i++;
+	    skipWhiteSpace(str);
 	    
 	    // Cases for value:
 	    value = parseValue(str);
 	    
+	    /* move past comma and skip whitespace if not at end
+	    if (i < str.length() - 1) {
+		i++;
+		skipWhiteSpace(str);
+	    } // if
+	    */
 	    members.add(new JSONMember(key, value));
 	} // while
     } // JSONObject(String str)
@@ -66,7 +84,7 @@ public class JSONObject {
 	Object value;
 
 	// We have a string
-	if (str.charAt(++i) == '\"') {
+	if (str.charAt(i) == '\"') {
 	    value = onString(str);
 	    // move past end quote
 	    i++;
@@ -135,6 +153,8 @@ public class JSONObject {
 	    // populate the list from the values in the array
 	    while (str.charAt(i) != ']') {
 		// move past open brace or comma
+		i++;
+		skipWhiteSpace(str);
 		vals.add(parseValue(str));
 	    } // while
 	    // move past end brace;
@@ -206,4 +226,11 @@ public class JSONObject {
 	} // while
 	return str.substring(initial, i + 1);
     } // inBrace(String)
+    
+    private void skipWhiteSpace(String str) {
+	while (i < str.length() && Character.isWhitespace(str.charAt(i))) {
+	        i++;
+	} // while
+	
+    }
 } // class JSONObject
